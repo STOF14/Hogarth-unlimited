@@ -1,0 +1,87 @@
+// Hogarth Unlimited — data model
+//
+// Single-user app: no User table on purpose. Auth is a single bearer token
+// checked in middleware (see src/auth.ts). If this ever needs multi-user,
+// add a User model and a userId FK on Comic — everything else holds up.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ComicStatus {
+  processing
+  ready
+  error
+}
+
+enum ComicFormat {
+  cbz
+  cbr
+}
+
+model Comic {
+  id           String          @id @default(cuid())
+  title        String
+  series       String?
+  number       String?
+  writer       String?
+  penciller    String?
+  year         String?
+  summary      String?
+  fileName     String
+  format       ComicFormat
+  status       ComicStatus     @default(processing)
+  errorMessage String?
+  pageCount    Int             @default(0)
+  archiveKey   String          // storage key for the original uploaded archive
+  coverKey     String?         // storage key for the generated cover thumbnail
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  pages        Page[]
+  tags         ComicTag[]
+  progress     ReadingProgress?
+
+  @@index([status])
+  @@index([series])
+}
+
+model Page {
+  id       String @id @default(cuid())
+  comicId  String
+  index    Int
+  imageKey String
+  width    Int?
+  height   Int?
+  comic    Comic  @relation(fields: [comicId], references: [id], onDelete: Cascade)
+
+  @@unique([comicId, index])
+}
+
+model Tag {
+  id     String     @id @default(cuid())
+  label  String     @unique
+  color  String     // one of a small fixed palette, validated at the API layer
+  comics ComicTag[]
+}
+
+model ComicTag {
+  comicId String
+  tagId   String
+  comic   Comic  @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([comicId, tagId])
+}
+
+model ReadingProgress {
+  comicId     String   @id
+  currentPage Int      @default(0)
+  completed   Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+  comic       Comic    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+}
