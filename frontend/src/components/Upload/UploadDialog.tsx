@@ -78,7 +78,10 @@ export function UploadDialog() {
         <input
           ref={inputRef}
           type="file"
-          accept=".cbz,.cbr,.zip,.rar"
+          // No accept filter here on purpose: iOS Safari's file picker can't
+// resolve a system file type for .cbr/.rar, so restricting to it
+// makes iOS grey out valid files instead of just rejecting bad ones.
+// The backend already validates the real extension server-side.
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
