@@ -1,0 +1,9 @@
+{
+  "name": "Hogarth Unlimited",
+  "short_name": "Hogarth",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0D",
+  "theme_color": "#0A0A0D",
+  "icons": []
+}

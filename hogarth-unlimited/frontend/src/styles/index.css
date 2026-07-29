@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  ::selection {
+    background: theme("colors.marvel.DEFAULT");
+    color: theme("colors.ink.DEFAULT");
+  }
+}
+
+@layer components {
+  /* The subtle two-tone halftone wash behind the library — the one
+     signature visual flourish carried over from the original build. */
+  .halftone-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgb(237 29 36 / 0.1) 1px, transparent 0),
+      radial-gradient(circle at 1px 1px, rgb(4 118 242 / 0.1) 1px, transparent 0);
+    background-size: 26px 26px, 26px 26px;
+    background-position: 0 0, 13px 13px;
+    mask-image: radial-gradient(ellipse 100% 60% at 50% 0%, black 0%, transparent 75%);
+  }
+}

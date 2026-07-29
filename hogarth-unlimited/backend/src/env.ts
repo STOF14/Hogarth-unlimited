@@ -7,6 +7,7 @@ const EnvSchema = z.object({
   API_TOKEN: z.string().min(16, "API_TOKEN must be at least 16 characters"),
   WEB_ORIGIN: z.string().url(),
   PORT: z.coerce.number().default(3000),
+
   S3_ENDPOINT: z.string().url(),
   S3_REGION: z.string().default("auto"),
   S3_BUCKET: z.string().min(1),
