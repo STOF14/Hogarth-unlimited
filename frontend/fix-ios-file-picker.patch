@@ -1,0 +1,17 @@
+diff -ru a/src/components/Upload/UploadDialog.tsx b/src/components/Upload/UploadDialog.tsx
+--- a/src/components/Upload/UploadDialog.tsx	2026-07-29 23:45:32.236567117 +0000
++++ b/src/components/Upload/UploadDialog.tsx	2026-07-29 23:45:32.265349439 +0000
+@@ -78,7 +78,12 @@
+         <input
+           ref={inputRef}
+           type="file"
+-          accept=".cbz,.cbr,.zip,.rar"
++          // No `accept` filter here on purpose: iOS Safari's file picker
++          // resolves `accept` against system file types (UTIs), and .cbr/.rar
++          // usually isn't registered as one — so restricting to it makes iOS
++          // grey out valid files instead of just rejecting bad ones. The
++          // backend already validates the real extension and returns a clear
++          // 400 for anything else, so nothing unsafe about opening this up.
+           className="hidden"
+           onChange={(e) => handleFiles(e.target.files)}
+         />
