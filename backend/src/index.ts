@@ -1,3 +1,4 @@
+import "dotenv/config"; // must run before ./env.js reads process.env
 import { buildServer } from "./server.js";
 import { env } from "./env.js";
 

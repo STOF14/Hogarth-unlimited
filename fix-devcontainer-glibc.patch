@@ -1,0 +1,11 @@
+diff -ru a/.devcontainer/devcontainer.json b/.devcontainer/devcontainer.json
+--- a/.devcontainer/devcontainer.json	2026-07-29 22:37:48.451093130 +0000
++++ b/.devcontainer/devcontainer.json	2026-07-29 22:37:48.451396275 +0000
+@@ -1,6 +1,6 @@
+ {
+   "name": "Hogarth Unlimited (Gutter)",
+-  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
++  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm",
+   "features": {
+     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+   },
