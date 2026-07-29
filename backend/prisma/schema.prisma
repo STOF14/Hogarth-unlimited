@@ -13,38 +13,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ComicStatus {
-  processing
-  ready
-  error
-}
-
-enum ComicFormat {
-  cbz
-  cbr
-}
+// SQLite has no native enum support in Prisma, so `status` and `format`
+// are plain strings here, constrained to a fixed set of values at the
+// application layer instead (see the Zod schemas / literal checks in
+// src/routes and src/lib). If this ever migrates to Postgres, these two
+// become real Prisma enums with a one-line schema change + migration.
 
 model Comic {
-  id           String          @id @default(cuid())
-  title        String
-  series       String?
-  number       String?
-  writer       String?
-  penciller    String?
-  year         String?
-  summary      String?
-  fileName     String
-  format       ComicFormat
-  status       ComicStatus     @default(processing)
+  id        String      @id @default(cuid())
+  title     String
+  series    String?
+  number    String?
+  writer    String?
+  penciller String?
+  year      String?
+  summary   String?
+
+  fileName    String
+  format      String // "cbz" | "cbr"
+  status      String @default("processing") // "processing" | "ready" | "error"
   errorMessage String?
-  pageCount    Int             @default(0)
-  archiveKey   String          // storage key for the original uploaded archive
-  coverKey     String?         // storage key for the generated cover thumbnail
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  pages        Page[]
-  tags         ComicTag[]
-  progress     ReadingProgress?
+
+  pageCount  Int      @default(0)
+  archiveKey String // storage key for the original uploaded archive
+  coverKey   String? // storage key for the generated cover thumbnail
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pages    Page[]
+  tags     ComicTag[]
+  progress ReadingProgress?
 
   @@index([status])
   @@index([series])
@@ -57,23 +56,26 @@ model Page {
   imageKey String
   width    Int?
   height   Int?
-  comic    Comic  @relation(fields: [comicId], references: [id], onDelete: Cascade)
+
+  comic Comic @relation(fields: [comicId], references: [id], onDelete: Cascade)
 
   @@unique([comicId, index])
 }
 
 model Tag {
-  id     String     @id @default(cuid())
-  label  String     @unique
-  color  String     // one of a small fixed palette, validated at the API layer
+  id    String @id @default(cuid())
+  label String @unique
+  color String // one of a small fixed palette, validated at the API layer
+
   comics ComicTag[]
 }
 
 model ComicTag {
   comicId String
   tagId   String
-  comic   Comic  @relation(fields: [comicId], references: [id], onDelete: Cascade)
-  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  comic Comic @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([comicId, tagId])
 }
@@ -83,5 +85,6 @@ model ReadingProgress {
   currentPage Int      @default(0)
   completed   Boolean  @default(false)
   updatedAt   DateTime @updatedAt
-  comic       Comic    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+
+  comic Comic @relation(fields: [comicId], references: [id], onDelete: Cascade)
 }

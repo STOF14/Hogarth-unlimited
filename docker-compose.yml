@@ -1,0 +1,16 @@
+# Local/dev convenience only — production deploy is the backend Dockerfile
+# on Fly.io (or similar), with the frontend built as static assets it
+# serves. This compose file just lets you run the API in a container
+# locally without installing sharp's native deps on your own machine.
+services:
+  api:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - db-data:/app/prisma
+
+volumes:
+  db-data:
