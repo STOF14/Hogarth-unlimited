@@ -35,11 +35,11 @@ export async function tagRoutes(app: FastifyInstance): Promise<void> {
     const { id } = request.params as { id: string };
     const parsed = z.object({ tagIds: z.array(z.string()) }).safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+    const uniqueTagIds = [...new Set(parsed.data.tagIds)];
 
     await db.comicTag.deleteMany({ where: { comicId: id } });
     await db.comicTag.createMany({
-      data: parsed.data.tagIds.map((tagId) => ({ comicId: id, tagId })),
-      skipDuplicates: true,
+      data: uniqueTagIds.map((tagId) => ({ comicId: id, tagId })),
     });
 
     const comic = await db.comic.findUnique({ where: { id }, include: { tags: { include: { tag: true } } } });
