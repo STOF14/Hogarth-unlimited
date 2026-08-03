@@ -4,7 +4,7 @@ import { useUiStore } from "../../store/uiStore";
 import { ComicCard } from "./ComicCard";
 
 export function LibraryGrid() {
-  const { search, activeTagId } = useUiStore();
+  const { search, setSearch, activeTagId, setActiveTagId } = useUiStore();
   const debouncedSearch = useDebounced(search, 250);
 
   const { data: comics, isLoading, isError } = useComics({
@@ -25,6 +25,26 @@ export function LibraryGrid() {
   }
 
   if (!comics || comics.length === 0) {
+    const hasFilters = Boolean(debouncedSearch.trim()) || activeTagId !== null;
+
+    if (hasFilters) {
+      return (
+        <div className="flex flex-col items-center gap-2 px-6 py-24 text-center text-ink-faint">
+          <span className="font-display text-2xl text-ink-dim">No matches</span>
+          <span className="text-sm">Try a different search or clear your filters.</span>
+          <button
+            onClick={() => {
+              setSearch("");
+              setActiveTagId(null);
+            }}
+            className="mt-2 rounded border border-line px-3 py-1.5 text-xs font-semibold text-ink-dim transition-colors hover:border-ink-faint hover:text-ink"
+          >
+            Clear filters
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col items-center gap-2 px-6 py-24 text-center text-ink-faint">
         <span className="font-display text-2xl text-ink-dim">Empty shelf</span>

@@ -14,13 +14,17 @@ export function UploadDialog() {
   const handleFiles = (files: FileList | null) => {
     const file = files?.[0];
     if (!file) return;
+    upload.reset();
     setProgress(0);
     upload.mutate(
       { file, onProgress: setProgress },
       {
-        onSettled: () => {
+        onSuccess: () => {
           setProgress(null);
           setUploadDialogOpen(false);
+        },
+        onError: () => {
+          setProgress(null);
         },
       }
     );
